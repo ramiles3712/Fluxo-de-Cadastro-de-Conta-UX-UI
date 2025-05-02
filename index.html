@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pontazo Bank | Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/cleave.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .input-pin {
+            letter-spacing: 10px;
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+            text-align: center;
+        }
+        
+        .keyboard-btn {
+            transition: all 0.2s;
+        }
+        
+        .keyboard-btn:active {
+            transform: scale(0.95);
+            background-color: #e0e0e0;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s forwards;
+        }
+        
+        .slide-out {
+            animation: slideOut 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            transition: all 0.2s;
+        }
+        
+        .upload-area:hover {
+            border-color: #6a1b9a;
+            background-color: #f8f5fc;
+        }
+        
+        .radio-option {
+            transition: all 0.2s;
+        }
+        
+        .radio-option:hover {
+            background-color: #f3e5f5;
+        }
+        
+        .radio-option.selected {
+            border-color: #6a1b9a;
+            background-color: #f3e5f5;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between">
+        <div class="flex items-center">
+            <div class="w-10 h-10 rounded-full bg-purple-800 flex items-center justify-center">
+                <i class="fas fa-university text-white text-xl"></i>
+            </div>
+            <h1 class="ml-3 text-xl font-bold text-gray-800">Banco Digital</h1>
+        </div>
+        <div class="text-sm text-gray-500">Ajuda</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden relative">
+        <!-- Login Flow -->
+        <div id="login-flow" class="w-full h-full flex flex-col bg-white">
+            <!-- Screen 1: CPF/CNPJ Input -->
+            <div id="login-screen-1" class="w-full h-full flex flex-col p-6 slide-in">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Acesse sua conta</h2>
+                    <div class="mb-8">
+                        <label for="cpf-cnpj" class="block text-sm font-medium text-gray-700 mb-2">Digite seu CPF ou CNPJ para continuar</label>
+                        <input type="text" id="cpf-cnpj" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200" placeholder="000.000.000-00">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <button onclick="nextToPin()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Próximo</button>
+                </div>
+                <div class="text-center text-sm text-gray-600">
+                    <span>Ainda não tem conta? </span>
+                    <button onclick="showRegisterFlow()" class="text-purple-800 font-medium hover:underline">Cadastre-se</button>
+                </div>
+            </div>
+
+            <!-- Screen 2: PIN Input -->
+            <div id="login-screen-2" class="w-full h-full flex flex-col p-6 hidden">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Digite sua senha de 4 dígitos</h2>
+                    <div class="mb-8 flex justify-center">
+                        <input type="password" id="pin-input" maxlength="4" class="input-pin w-40 px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200" placeholder="****">
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 max-w-xs mx-auto">
+                        <button onclick="appendPin('1')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">1</button>
+                        <button onclick="appendPin('2')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">2</button>
+                        <button onclick="appendPin('3')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">3</button>
+                        <button onclick="appendPin('4')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">4</button>
+                        <button onclick="appendPin('5')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">5</button>
+                        <button onclick="appendPin('6')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">6</button>
+                        <button onclick="appendPin('7')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">7</button>
+                        <button onclick="appendPin('8')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">8</button>
+                        <button onclick="appendPin('9')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">9</button>
+                        <button onclick="clearPin()" class="keyboard-btn bg-gray-100 text-gray-800 text-sm font-medium py-4 rounded-lg hover:bg-gray-200"><i class="fas fa-arrow-left"></i></button>
+                        <button onclick="appendPin('0')" class="keyboard-btn bg-gray-100 text-gray-800 text-xl font-medium py-4 rounded-lg hover:bg-gray-200">0</button>
+                        <button onclick="removePin()" class="keyboard-btn bg-gray-100 text-gray-800 text-sm font-medium py-4 rounded-lg hover:bg-gray-200">Limpar</button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <button onclick="nextToOTP()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Avançar</button>
+                </div>
+                <div class="text-center text-sm text-gray-600">
+                    <button class="text-purple-800 font-medium hover:underline">Esqueceu o PIN?</button>
+                </div>
+            </div>
+
+            <!-- Screen 3: OTP Input -->
+            <div id="login-screen-3" class="w-full h-full flex flex-col p-6 hidden">
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Digite o código de verificação</h2>
+                    <div class="mb-4">
+                        <label for="otp-input" class="block text-sm font-medium text-gray-700 mb-2">Código de 6 dígitos</label>
+                        <input type="text" id="otp-input" maxlength="6" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200" placeholder="000000">
+                    </div>
+                    <p class="text-sm text-gray-600 mb-8">O código foi enviado por SMS ou gerado no seu app autenticador</p>
+                </div>
+                <div class="mb-4">
+                    <button onclick="login()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Entrar</button>
+                </div>
+                <div class="text-center text-sm text-gray-600">
+                    <button class="text-purple-800 font-medium hover:underline">Reenviar código</button>
+                </div>
+            </div>
+
+            <!-- Screen 4: Error Message -->
+            <div id="login-screen-4" class="w-full h-full flex flex-col p-6 hidden">
+                <div class="flex-1 flex flex-col items-center justify-center">
+                    <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                        <i class="fas fa-exclamation-circle text-red-600 text-2xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">Erro na autenticação</h2>
+                    <p class="text-gray-600 text-center mb-8">O código inserido está incorreto ou expirou. Por favor, tente novamente.</p>
+                </div>
+                <div class="mb-4">
+                    <button onclick="backToOTP()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Tentar novamente</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Flow -->
+        <div id="register-flow" class="w-full h-full flex flex-col bg-white hidden">
+            <!-- Screen 1: Personal Data -->
+            <div id="register-screen-1" class="w-full h-full flex flex-col p-6">
+                <div class="flex-1 overflow-y-auto">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Crie sua conta</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="full-name" class="block text-sm font-medium text-gray-700 mb-1">Nome completo</label>
+                            <input type="text" id="full-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="register-cpf" class="block text-sm font-medium text-gray-700 mb-1">CPF</label>
+                            <input type="text" id="register-cpf" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200" placeholder="000.000.000-00">
+                        </div>
+                        <div>
+                            <label for="birth-date" class="block text-sm font-medium text-gray-700 mb-1">Data de nascimento</label>
+                            <input type="date" id="birth-date" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="mother-name" class="block text-sm font-medium text-gray-700 mb-1">Nome da mãe</label>
+                            <input type="text" id="mother-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Gênero</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="selectGender('Masculino')" class="radio-option py-2 px-4 border rounded-lg text-center">Masculino</button>
+                                <button onclick="selectGender('Feminino')" class="radio-option py-2 px-4 border rounded-lg text-center">Feminino</button>
+                                <button onclick="selectGender('Outro')" class="radio-option py-2 px-4 border rounded-lg text-center">Outro</button>
+                            </div>
+                            <input type="hidden" id="gender" value="">
+                        </div>
+                        <div>
+                            <label for="marital-status" class="block text-sm font-medium text-gray-700 mb-1">Estado civil</label>
+                            <select id="marital-status" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200">
+                                <option value="">Selecione</option>
+                                <option value="Solteiro(a)">Solteiro(a)</option>
+                                <option value="Casado(a)">Casado(a)</option>
+                                <option value="Divorciado(a)">Divorciado(a)</option>
+                                <option value="Viúvo(a)">Viúvo(a)</option>
+                                <option value="Separado(a)">Separado(a)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 mb-4">
+                    <button onclick="nextToDocument()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Screen 2: Document -->
+            <div id="register-screen-2" class="w-full h-full flex flex-col p-6 hidden">
+                <div class="flex-1 overflow-y-auto">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Documento de Identidade</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="doc-type" class="block text-sm font-medium text-gray-700 mb-1">Tipo de documento</label>
+                            <select id="doc-type" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200">
+                                <option value="">Selecione</option>
+                                <option value="RG">RG</option>
+                                <option value="CNH">CNH</option>
+                                <option value="Passaporte">Passaporte</option>
+                                <option value="RNE">RNE</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="doc-number" class="block text-sm font-medium text-gray-700 mb-1">Número do documento</label>
+                            <input type="text" id="doc-number" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="doc-issue-date" class="block text-sm font-medium text-gray-700 mb-1">Data de emissão</label>
+                            <input type="date" id="doc-issue-date" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 mb-4">
+                    <button onclick="nextToAdditionalInfo()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Screen 3: Additional Info -->
+            <div id="register-screen-3" class="w-full h-full flex flex-col p-6 hidden">
+                <div class="flex-1 overflow-y-auto">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Informações Complementares</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="monthly-income" class="block text-sm font-medium text-gray-700 mb-1">Renda mensal</label>
+                            <input type="text" id="monthly-income" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-800 focus:ring-1 focus:ring-purple-800 transition duration-200" placeholder="R$">
+                        </div>
+                        <div class="flex items-center justify-between py-3">
+                            <span class="text-sm font-medium text-gray-700">Você é estrangeiro?</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="foreigner" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-800"></div>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Você é uma pessoa politicamente exposta (PEP)?</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="selectPEP('Sim')" class="radio-option py-2 px-4 border rounded-lg text-center">Sim</button>
+                                <button onclick="selectPEP('Não')" class="radio-option py-2 px-4 border rounded-lg text-center">Não</button>
+                            </div>
+                            <input type="hidden" id="pep" value="">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 mb-4">
+                    <button onclick="nextToDocumentUpload()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Screen 4: Document Upload -->
+            <div id="register-screen-4" class="w-full h-full flex flex-col p-6 hidden">
+                <div class="flex-1 overflow-y-auto">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Upload de Documento</h2>
+                    <div class="space-y-4">
+                        <div class="upload-area rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer" onclick="document.getElementById('file-input').click()">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-600 font-medium">Arraste ou clique para selecionar</p>
+                            <p class="text-gray-500 text-sm mt-1">Formatos aceitos: JPG, PNG, PDF (até 5MB)</p>
+                            <input type="file" id="file-input" class="hidden" accept="image/*,.pdf">
+                        </div>
+                        <div id="file-preview" class="hidden">
+                            <div class="border rounded-lg p-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-file-alt text-gray-500 text-xl mr-3"></i>
+                                    <div>
+                                        <p id="file-name" class="font-medium text-gray-800"></p>
+                                        <p id="file-size" class="text-xs text-gray-500"></p>
+                                    </div>
+                                </div>
+                                <button onclick="removeFile()" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="upload-progress" class="hidden">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div id="progress-bar" class="bg-purple-800 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Enviando arquivo...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 mb-4">
+                    <button onclick="nextToConfirmation()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Screen 5: Confirmation -->
+            <div id="register-screen-5" class="w-full h-full flex flex-col p-6 hidden">
+                <div class="flex-1 overflow-y-auto">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Confirmação Final</h2>
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h3 class="font-medium text-gray-800 mb-3">Dados Pessoais</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="text-gray-600">Nome completo:</div>
+                            <div id="confirm-name" class="font-medium"></div>
+                            <div class="text-gray-600">CPF:</div>
+                            <div id="confirm-cpf" class="font-medium"></div>
+                            <div class="text-gray-600">Data nasc.:</div>
+                            <div id="confirm-birth" class="font-medium"></div>
+                            <div class="text-gray-600">Nome da mãe:</div>
+                            <div id="confirm-mother" class="font-medium"></div>
+                            <div class="text-gray-600">Gênero:</div>
+                            <div id="confirm-gender" class="font-medium"></div>
+                            <div class="text-gray-600">Estado civil:</div>
+                            <div id="confirm-marital" class="font-medium"></div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h3 class="font-medium text-gray-800 mb-3">Documentos</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="text-gray-600">Tipo doc.:</div>
+                            <div id="confirm-doc-type" class="font-medium"></div>
+                            <div class="text-gray-600">Número:</div>
+                            <div id="confirm-doc-number" class="font-medium"></div>
+                            <div class="text-gray-600">Emissão:</div>
+                            <div id="confirm-doc-date" class="font-medium"></div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h3 class="font-medium text-gray-800 mb-3">Informações Adicionais</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="text-gray-600">Renda mensal:</div>
+                            <div id="confirm-income" class="font-medium"></div>
+                            <div class="text-gray-600">Estrangeiro:</div>
+                            <div id="confirm-foreigner" class="font-medium"></div>
+                            <div class="text-gray-600">PEP:</div>
+                            <div id="confirm-pep" class="font-medium"></div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-4">Ao continuar, você aceita os <a href="#" class="text-purple-800 hover:underline">termos de uso</a> e <a href="#" class="text-purple-800 hover:underline">política de privacidade</a> do Banco Digital.</p>
+                </div>
+                <div class="mt-4 mb-4">
+                    <button onclick="completeRegistration()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Finalizar Cadastro</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="success-modal" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden fade-in">
+            <div class="bg-white rounded-xl p-6 max-w-sm mx-4">
+                <div class="flex justify-center mb-4">
+                    <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                    </div>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800 text-center mb-2">Cadastro concluído!</h2>
+                <p class="text-gray-600 text-center mb-6">Sua conta foi criada com sucesso. Em breve você receberá um e-mail com as instruções para ativação.</p>
+                <button onclick="closeSuccessModal()" class="w-full bg-purple-800 text-white py-3 rounded-lg font-medium hover:bg-purple-900 transition duration-200">Entendido</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize input masks
+        document.addEventListener('DOMContentLoaded', function() {
+            // CPF/CNPJ mask for login
+            new Cleave('#cpf-cnpj', {
+                numericOnly: true,
+                blocks: [0, 3, 3, 3, 2],
+                delimiters: ['.', '.', '-'],
+                delimiterLazyShow: true
+            });
+            
+            // CPF mask for registration
+            new Cleave('#register-cpf', {
+                numericOnly: true,
+                blocks: [0, 3, 3, 3, 2],
+                delimiters: ['.', '.', '-'],
+                delimiterLazyShow: true
+            });
+            
+            // Monthly income mask
+            new Cleave('#monthly-income', {
+                prefix: 'R$',
+                numeral: true,
+                numeralThousandsGroupStyle: 'thousand',
+                numeralDecimalMark: ',',
+                numeralDecimalScale: 2,
+                numeralPositiveOnly: true
+            });
+            
+            // File input change handler
+            document.getElementById('file-input').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    document.getElementById('file-name').textContent = file.name;
+                    document.getElementById('file-size').textContent = formatFileSize(file.size);
+                    document.getElementById('file-preview').classList.remove('hidden');
+                    
+                    // Simulate upload progress
+                    document.getElementById('upload-progress').classList.remove('hidden');
+                    let progress = 0;
+                    const interval = setInterval(() => {
+                        progress += 10;
+                        document.getElementById('progress-bar').style.width = `${progress}%`;
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                        }
+                    }, 200);
+                }
+            });
+        });
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function removeFile() {
+            document.getElementById('file-input').value = '';
+            document.getElementById('file-preview').classList.add('hidden');
+            document.getElementById('upload-progress').classList.add('hidden');
+            document.getElementById('progress-bar').style.width = '0%';
+        }
+        
+        // Login Flow Functions
+        function nextToPin() {
+            const cpfCnpj = document.getElementById('cpf-cnpj').value;
+            if (cpfCnpj.length < 11) {
+                alert('Por favor, insira um CPF ou CNPJ válido');
+                return;
+            }
+            
+            document.getElementById('login-screen-1').classList.add('slide-out');
+            setTimeout(() => {
+                document.getElementById('login-screen-1').classList.add('hidden');
+                document.getElementById('login-screen-2').classList.remove('hidden');
+                document.getElementById('login-screen-2').classList.add('slide-in');
+            }, 300);
+        }
+        
+        function appendPin(number) {
+            const pinInput = document.getElementById('pin-input');
+            if (pinInput.value.length < 4) {
+                pinInput.value += number;
+            }
+        }
+        
+        function removePin() {
+            const pinInput = document.getElementById('pin-input');
+            pinInput.value = pinInput.value.slice(0, -1);
+        }
+        
+        function clearPin() {
+            document.getElementById('pin-input').value = '';
+        }
+        
+        function nextToOTP() {
+            const pin = document.getElementById('pin-input').value;
+            if (pin.length !== 4) {
+                alert('Por favor, insira um PIN de 4 dígitos');
+                return;
+            }
+            
+            document.getElementById('login-screen-2').classList.add('slide-out');
+            setTimeout(() => {
+                document.getElementById('login-screen-2').classList.add('hidden');
+                document.getElementById('login-screen-3').classList.remove('hidden');
+                document.getElementById('login-screen-3').classList.add('slide-in');
+            }, 300);
+        }
+        
+        function login() {
+            const otp = document.getElementById('otp-input').value;
+            if (otp.length !== 6) {
+                alert('Por favor, insira um código OTP de 6 dígitos');
+                return;
+            }
+            
+            // Simulate API call with random success/failure
+            const isSuccess = Math.random() > 0.3;
+            
+            if (isSuccess) {
+                alert('Login realizado com sucesso!');
+                // Here you would redirect to the dashboard
+            } else {
+                document.getElementById('login-screen-3').classList.add('slide-out');
+                setTimeout(() => {
+                    document.getElementById('login-screen-3').classList.add('hidden');
+                    document.getElementById('login-screen-4').classList.remove('hidden');
+                    document.getElementById('login-screen-4').classList.add('slide-in');
+                }, 300);
+            }
+        }
+        
+        function backToOTP() {
+            document.getElementById('login-screen-4').classList.add('slide-out');
+            setTimeout(() => {
+                document.getElementById('login-screen-4').classList.add('hidden');
+                document.getElementById('login-screen-3').classList.remove('hidden');
+                document.getElementById('login-screen-3').classList.add('slide-in');
+                document.getElementById('otp-input').value = '';
+            }, 300);
+        }
+        
+        // Register Flow Functions
+        function showRegisterFlow() {
+            document.getElementById('login-flow').classList.add('slide-out');
+            setTimeout(() => {
+                document.getElementById('login-flow').classList.add('hidden');
+                document.getElementById('register-flow').classList.remove('hidden');
+                document.getElementById('register-flow').classList.add('slide-in');
+            }, 300);
+        }
+        
+        function selectGender(gender) {
+            document.getElementById('gender').value = gender;
+            
+            // Remove selected class from all buttons
+            document.querySelectorAll('.radio-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked button
+            event.target.classList.add('selected');
+        }
+        
+        function selectPEP(pep) {
+            document.getElementById('pep').value = pep;
+            
+            // Remove selected class from all buttons
+            document.querySelectorAll('.radio-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked button
+            event.target.classList.add('selected');
+        }
+        
+        function nextToDocument() {
+            // Validate fields
+            const fullName = document.getElementById('full-name').value;
+            const cpf = document.getElementById('register-cpf').value;
+            const birthDate = document.getElementById('birth-date').value;
+            const motherName = document.getElementById('mother-name').value;
+            const gender = document.getElementById('gender').value;
+            const maritalStatus = document.getElementById('marital-status').value;
+            
+            if (!fullName || !cpf || !birthDate || !motherName || !gender || !maritalStatus) {
+                alert('Por favor, preencha todos os campos obrigatórios');
+                return;
+            }
+            
+            document.getElementById('register-screen-1').classList.add('slide-out');
+            setTimeout(() => {
+                document.getElementById('register-screen-1').classList.add('hidden');
+                document.getElementById('register-screen-2').classList.remove('hidden');
+                document.getElementById('register-screen-2').classList.add('slide-in');
+            }, 300);
+        }
+        
+        function nextToAdditionalInfo() {
+            // Validate fields
+            const docType = document.getElementById('doc-type').value;
+            const docNumber = document.getElementById('doc-number').value;
+            const docIssueDate = document.getElementById('doc-issue-date').value;
+            
+            if (!docType || !docNumber || !docIssueDate) {
+                alert('Por favor, preencha todos os campos obrigatórios');
+                return;
+            }
+            
+            document.getElementById('register-screen-2').classList.add('slide-out');
+            setTimeout(() => {
+                document.getElementById('register-screen-2').classList.add('hidden');
+                document.getElementById('register-screen-3').classList.remove('hidden');
+                document.getElementById('register-screen-3').classList.add('slide-in');
+            }, 300);
+        }
+        
+        function nextToDocumentUpload() {
+            // Validate fields
+            const monthlyIncome = document.getElementById('monthly-income').value;
+            const pep = document.getElementById('pep').value;
+            
+            if (!monthlyIncome || !pep) {
+                alert('Por favor, preencha todos os campos obrigatórios');
+                return;
+            }
+            
+            document.getElementById('register-screen-3').classList.add('slide-out');
+            setTimeout(() => {
+                document.getElementById('register-screen-3').classList.add('hidden');
+                document.getElementById('register-screen-4').classList.remove('hidden');
+                document.getElementById('register-screen-4').classList.add('slide-in');
+            }, 300);
+        }
+        
+        function nextToConfirmation() {
+            // Validate file upload
+            if (!document.getElementById('file-input').value) {
+                alert('Por favor, faça o upload do documento solicitado');
+                return;
+            }
+            
+            // Update confirmation screen with all data
+            document.getElementById('confirm-name').textContent = document.getElementById('full-name').value;
+            document.getElementById('confirm-cpf').textContent = document.getElementById('register-cpf').value;
+            document.getElementById('confirm-birth').textContent = formatDate(document.getElementById('birth-date').value);
+            document.getElementById('confirm-mother').textContent = document.getElementById('mother-name').value;
+            document.getElementById('confirm-gender').textContent = document.getElementById('gender').value;
+            document.getElementById('confirm-marital').textContent = document.getElementById('marital-status').value;
+            
+            document.getElementById('confirm-doc-type').textContent = document.getElementById('doc-type').value;
+            document.getElementById('confirm-doc-number').textContent = document.getElementById('doc-number').value;
+            document.getElementById('confirm-doc-date').textContent = formatDate(document.getElementById('doc-issue-date').value);
+            
+            document.getElementById('confirm-income').textContent = document.getElementById('monthly-income').value;
+            document.getElementById('confirm-foreigner').textContent = document.getElementById('foreigner').checked ? 'Sim' : 'Não';
+            document.getElementById('confirm-pep').textContent = document.getElementById('pep').value;
+            
+            document.getElementById('register-screen-4').classList.add('slide-out');
+            setTimeout(() => {
+                document.getElementById('register-screen-4').classList.add('hidden');
+                document.getElementById('register-screen-5').classList.remove('hidden');
+                document.getElementById('register-screen-5').classList.add('slide-in');
+            }, 300);
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        }
+        
+        function completeRegistration() {
+            // Show success modal
+            document.getElementById('success-modal').classList.remove('hidden');
+        }
+        
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+            // Here you would redirect to login or dashboard
+        }
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=Ramiles/pontazo-bank" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</html>
